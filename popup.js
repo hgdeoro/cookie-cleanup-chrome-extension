@@ -76,6 +76,11 @@ var UI_UTILS = {
 				document.createElement('hr'));
 	},
 
+	addBr : function() {
+		document.getElementById('container').appendChild(
+				document.createElement('br'));
+	},
+
 	addBadge : function(badge_type, text) {
 		// <span class="badge badge-success">2</span>
 		new_elem = document.createElement('span');
@@ -261,14 +266,11 @@ function filterCookies(callback) {
 	});
 }
 
-function remove_cookies() {
-	/**
-	 * Remove the cookies
-	 */
+function _remove_cookies(cookies_list, domain_list) {
 	UI_UTILS.cleanHtml();
 	UI_UTILS.addElement(HEADER_TAG, 'Removed...');
 	var informed_cookies = {};
-	BLACK_COOKIES.forEach(function(a_cookie) {
+	cookies_list.forEach(function(a_cookie) {
 		removeCookie(a_cookie, informed_cookies);
 	});
 
@@ -279,9 +281,38 @@ function remove_cookies() {
 	document.getElementById('container').appendChild(
 			document.createTextNode(' '));
 
-	UI_UTILS.addBadge('badge-important', 'Removed ' + BLACK_COOKIES.length
-			+ ' cookies from ' + BLACK_DOMAINS.length + ' domains');
+	UI_UTILS.addBadge('badge-important', 'Removed ' + cookies_list.length
+			+ ' cookies from ' + domain_list.length + ' domains');
+}
 
+function quick_remove_cookies() {
+	/**
+	 * Remove the BLACK-LISTED cookies
+	 */
+	_remove_cookies(BLACK_COOKIES, BLACK_DOMAINS);
+}
+
+function full_remove_cookies() {
+	/**
+	 * Remove booth GRAY and BLACK-LISTED cookies
+	 */
+	var cookies_array = [];
+	BLACK_COOKIES.forEach(function(item) {
+		cookies_array.push(item);
+	});
+	GRAY_COOKIES.forEach(function(item) {
+		cookies_array.push(item);
+	});
+
+	var domains_array = [];
+	BLACK_DOMAINS.forEach(function(item) {
+		domains_array.push(item);
+	});
+	GRAY_DOMAINS.forEach(function(item) {
+		domains_array.push(item);
+	});
+
+	_remove_cookies(cookies_array, domains_array);
 }
 
 function show_preview() {
@@ -314,13 +345,30 @@ function show_preview() {
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
 	var new_elem = document.createElement('button');
-	new_elem.id = 'cleanup_action';
+	new_elem.id = 'quick_cleanup_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-success btn-small';
+	new_elem.appendChild(document.createTextNode('Fast clean up'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#quick_cleanup_action').addEventListener('click',
+			quick_remove_cookies);
+
+	UI_UTILS
+			.addElement('p', 'Remove cookies from black-listed domains only...');
+
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+	var new_elem = document.createElement('button');
+	new_elem.id = 'full_cleanup_action';
 	new_elem.type = 'button';
 	new_elem.className = 'btn btn-danger btn-small';
-	new_elem.appendChild(document.createTextNode('Clean up'));
+	new_elem.appendChild(document.createTextNode('FULL clean up'));
 	document.getElementById('container').appendChild(new_elem);
-	document.querySelector('#cleanup_action').addEventListener('click',
-			remove_cookies);
+	document.querySelector('#full_cleanup_action').addEventListener('click',
+			full_remove_cookies);
+
+	UI_UTILS.addElement('p',
+			'Remove all the cookies (included that from gray-list domains)');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
@@ -329,15 +377,13 @@ function show_preview() {
 					+ ' cookies from ' + WHITE_DOMAINS.length
 					+ ' domains will be kept');
 
-	document.getElementById('container').appendChild(
-			document.createElement('br'));
+	UI_UTILS.addBr(); // <br>
 
 	UI_UTILS.addBadge('badge-warning', '' + GRAY_COOKIES.length
 			+ ' cookies from ' + GRAY_DOMAINS.length
 			+ ' domains are gray-listed');
 
-	document.getElementById('container').appendChild(
-			document.createElement('br'));
+	UI_UTILS.addBr(); // <br>
 
 	UI_UTILS.addBadge('badge-important', '' + BLACK_COOKIES.length
 			+ ' cookies from ' + BLACK_DOMAINS.length
