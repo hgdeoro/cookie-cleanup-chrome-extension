@@ -4,11 +4,15 @@ var WHITE_LIST_REGEXS = [];
 var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
 
 var utils = {
-	cleanHtml : function(tag, text) {
+	cleanHtml : function() {
 		/**
 		 * Clean up the HTML (the UI)
 		 */
-		document.body.innerHTML = "";
+		// document.body.innerHTML = "";
+		var container = document.getElementById('container');
+		container.innerHTML = "";
+		// if (container.firstChild)
+		// container.remove(container.firstChild);
 	},
 
 	addHtml : function(tag, text) {
@@ -17,7 +21,8 @@ var utils = {
 		 */
 		var new_elem = document.createElement(tag);
 		new_elem.appendChild(document.createTextNode(text));
-		document.body.appendChild(new_elem);
+		// document.body.appendChild(new_elem);
+		document.getElementById('container').appendChild(new_elem);
 	},
 
 	shouldKeep : function(a_cookie) {
@@ -159,11 +164,13 @@ var cookiesCleaner = {
 				utils.addHtml('h1', 'Cleanup DONE!');
 			} else {
 				// Add link to start actual removal...
-				var new_elem = document.createElement('a');
-				new_elem.href = '#';
+				// <button class="btn btn-small" type="button">Small button</button>
+				var new_elem = document.createElement('button');
 				new_elem.id = 'cleanup_action';
+				new_elem.type = 'button';
+				new_elem.className = 'btn btn-danger btn-small';
 				new_elem.appendChild(document.createTextNode('Clean up'));
-				document.body.appendChild(new_elem);
+				document.getElementById('container').appendChild(new_elem);
 				document.querySelector('#cleanup_action').addEventListener(
 						'click', cookiesCleaner.cleanup);
 			}
@@ -176,7 +183,7 @@ var cookiesCleaner = {
 		 */
 		utils.initLocalStorage();
 		utils.populateWhiteList();
-		document.body.innerHTML = "";
+		utils.cleanHtml();
 		cookiesCleaner._preview_or_cleanup(false); // do_cleanup: false
 	},
 
@@ -184,7 +191,7 @@ var cookiesCleaner = {
 		/**
 		 * Clean Up
 		 */
-		document.body.innerHTML = "";
+		utils.cleanHtml();
 		cookiesCleaner._preview_or_cleanup(true); // do_cleanup: true
 	},
 
