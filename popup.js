@@ -44,6 +44,15 @@ var UI_UTILS = {
 		document.getElementById('container').appendChild(new_elem);
 	},
 
+	addSmallText : function(text, className) {
+		var new_elem = document.createElement('div');
+		var small_elem = document.createElement('small');
+		small_elem.appendChild(document.createTextNode(text));
+		new_elem.appendChild(small_elem);
+		new_elem.className = className;
+		document.getElementById('container').appendChild(new_elem);
+	},
+
 	addItemToKeep : function(text) {
 		var new_elem = document.createElement('div');
 		var small_elem = document.createElement('small');
@@ -290,7 +299,7 @@ function show_preview() {
 
 	UI_UTILS.addElement(HEADER_TAG, 'Gray list domains:');
 	GRAY_DOMAINS.forEach(function(item) {
-		UI_UTILS.addItemToRemove(item);
+		UI_UTILS.addSmallText(item, 'text-warning');
 	});
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
@@ -315,14 +324,24 @@ function show_preview() {
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
-	UI_UTILS.addBadge('badge-success', 'Will keep ' + WHITE_COOKIES.length
-			+ ' cookies from ' + WHITE_DOMAINS.length + ' domains');
+	UI_UTILS
+			.addBadge('badge-success', '' + WHITE_COOKIES.length
+					+ ' cookies from ' + WHITE_DOMAINS.length
+					+ ' domains will be kept');
 
 	document.getElementById('container').appendChild(
-			document.createTextNode(' '));
+			document.createElement('br'));
 
-	UI_UTILS.addBadge('badge-important', 'Will remove ' + BLACK_COOKIES.length
-			+ ' cookies from ' + BLACK_DOMAINS.length + ' domains');
+	UI_UTILS.addBadge('badge-warning', '' + GRAY_COOKIES.length
+			+ ' cookies from ' + GRAY_DOMAINS.length
+			+ ' domains are gray-listed');
+
+	document.getElementById('container').appendChild(
+			document.createElement('br'));
+
+	UI_UTILS.addBadge('badge-important', '' + BLACK_COOKIES.length
+			+ ' cookies from ' + BLACK_DOMAINS.length
+			+ ' domains will be removed');
 
 }
 
