@@ -98,10 +98,10 @@ var cookiesCleaner = {
 
 			if (do_cleanup == true) {
 				console.info("Starting cleanup...");
-				utils.addHtml('h2', 'Keeping...');
+				utils.addHtml('h1', 'Keeping...');
 			} else {
 				console.info("Starting preview...");
-				utils.addHtml('h2', 'Will keep...');
+				utils.addHtml('h1', 'Will keep...');
 			}
 			var keeped_domains = [];
 			var removed_domains = [];
@@ -129,9 +129,9 @@ var cookiesCleaner = {
 			 */
 
 			if (do_cleanup == true) {
-				utils.addHtml('h2', 'Removing...');
+				utils.addHtml('h1', 'Removing...');
 			} else {
-				utils.addHtml('h2', 'Will remove...');
+				utils.addHtml('h1', 'Will remove...');
 			}
 
 			all_the_cookies.forEach(function(a_cookie) {
