@@ -110,18 +110,19 @@ var cookiesCleaner = {
 			 * List cookies to keep/kept
 			 */
 
-			for ( var i = 0; i < all_the_cookies.length; i++) {
-				var a_cookie = all_the_cookies[i];
-				if (utils.shouldKeep(a_cookie)) {
-					//
-					// Keep this cookie...
-					//
-					if (keeped_domains.indexOf(a_cookie.domain) == -1) {
-						utils.addHtml('div', "Keep: " + a_cookie.domain);
-						keeped_domains.push(a_cookie.domain);
-					}
+			all_the_cookies.forEach(function(a_cookie) {
+				if (!utils.shouldKeep(a_cookie))
+					return;
+
+				//
+				// Keep this cookie...
+				//
+				if (keeped_domains.indexOf(a_cookie.domain) == -1) {
+					utils.addHtml('div', "Keep: " + a_cookie.domain);
+					keeped_domains.push(a_cookie.domain);
 				}
-			}
+
+			});
 
 			/*
 			 * List cookies to remove/removed
@@ -132,21 +133,23 @@ var cookiesCleaner = {
 			} else {
 				utils.addHtml('h2', 'Will remove...');
 			}
-			for ( var i = 0; i < all_the_cookies.length; i++) {
-				var a_cookie = all_the_cookies[i];
-				if (!utils.shouldKeep(a_cookie)) {
-					//
-					// REMOVE this cookie...
-					//
-					if (removed_domains.indexOf(a_cookie.domain) == -1) {
-						utils.addHtml('div', "Remove: " + a_cookie.domain);
-						removed_domains.push(a_cookie.domain);
-					}
-					if (do_cleanup == true) {
-						utils.removeCookie(a_cookie);
-					}
+
+			all_the_cookies.forEach(function(a_cookie) {
+				if (utils.shouldKeep(a_cookie))
+					return;
+
+				//
+				// REMOVE this cookie...
+				//
+				if (removed_domains.indexOf(a_cookie.domain) == -1) {
+					utils.addHtml('div', "Remove: " + a_cookie.domain);
+					removed_domains.push(a_cookie.domain);
 				}
-			}
+				if (do_cleanup == true) {
+					utils.removeCookie(a_cookie);
+				}
+
+			});
 
 			/*
 			 * Add the footer with buttons
