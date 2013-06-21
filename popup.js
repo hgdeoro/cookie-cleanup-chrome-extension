@@ -7,6 +7,8 @@ var DOMAINS_TO_KEEP = null;
 var DOMAINS_TO_REMOVE = null;
 var COOKIES_TO_REMOVE = null;
 
+var HEADER_TAG = 'h3';
+
 var UI_UTILS = {
 	cleanHtml : function() {
 		/**
@@ -17,7 +19,7 @@ var UI_UTILS = {
 		container.innerHTML = "";
 	},
 
-	addHtml : function(tag, text) {
+	addElement : function(tag, text) {
 		/**
 		 * Add an HTML element to the UI
 		 */
@@ -29,19 +31,31 @@ var UI_UTILS = {
 
 	addItemToKeep : function(text) {
 		var new_elem = document.createElement('div');
-		new_elem.appendChild(document.createTextNode(text));
+		var small_elem = document.createElement('small');
+		small_elem.appendChild(document.createTextNode(text));
+		new_elem.appendChild(small_elem);
 		new_elem.className = 'text-success';
 		document.getElementById('container').appendChild(new_elem);
 	},
 
 	addItemToRemove : function(text) {
 		var new_elem = document.createElement('div');
-		new_elem.appendChild(document.createTextNode(text));
+		var small_elem = document.createElement('small');
+		small_elem.appendChild(document.createTextNode(text));
+		new_elem.appendChild(small_elem);
 		new_elem.className = 'text-error';
 		document.getElementById('container').appendChild(new_elem);
 	},
 
 };
+
+function cleanDomain(domain) {
+	if (domain[0] == 'w' && domain[1] == 'w' && domain[2] == 'w')
+		domain = domain.substring(3);
+	if (domain[0] == '.')
+		domain = domain.substring(1);
+	return domain;
+}
 
 function cleanDomainList(domain_list) {
 	/**
@@ -49,11 +63,7 @@ function cleanDomainList(domain_list) {
 	 */
 	var _dict = {};
 	domain_list.forEach(function(domain) {
-		if (domain[0] == 'w' && domain[1] == 'w' && domain[2] == 'w')
-			domain = domain.substring(3);
-		if (domain[0] == '.')
-			domain = domain.substring(1);
-		_dict[domain] = 0;
+		_dict[cleanDomain(domain)] = 0;
 	});
 	var _list = Object.keys(_dict);
 	_list.sort();
@@ -75,7 +85,7 @@ function shouldKeepCookie(a_cookie) {
 	return false;
 }
 
-function removeCookie(cookie) {
+function removeCookie(cookie, informed) {
 	/**
 	 * Removes a cookie.
 	 */
@@ -87,7 +97,11 @@ function removeCookie(cookie) {
 	// "name" : cookie.name,
 	// "storeId" : cookie.storeId,
 	// });
-	UI_UTILS.addItemToRemove(cookie.domain);
+	var cleaned_domain = cleanDomain(cookie.domain);
+	if (!(informed[cleaned_domain] == 1)) {
+		informed[cleaned_domain] = 1;
+		UI_UTILS.addItemToRemove(cleaned_domain);
+	}
 }
 
 function populateWhiteList() {
@@ -118,7 +132,7 @@ function initLocalStorage() {
 	localStorage.setItem('white_list', JSON.stringify(INITIAL_WHITE_LIST));
 }
 
-function processCookies(callback) {
+function filterCookies(callback) {
 	/**
 	 * Process the cookies, and run `callback()` when done.
 	 */
@@ -152,9 +166,10 @@ function remove_cookies() {
 	 * Remove the cookies
 	 */
 	UI_UTILS.cleanHtml();
-	UI_UTILS.addHtml('h1', 'Removed...');
+	UI_UTILS.addElement(HEADER_TAG, 'Removed...');
+	var informed_cookies = {};
 	COOKIES_TO_REMOVE.forEach(function(a_cookie) {
-		removeCookie(a_cookie);
+		removeCookie(a_cookie, informed_cookies);
 	});
 }
 
@@ -164,17 +179,20 @@ function show_preview() {
 	 */
 	UI_UTILS.cleanHtml();
 
-	console.info("Starting preview...");
-	UI_UTILS.addHtml('h1', 'Will keep...');
+	UI_UTILS.addElement(HEADER_TAG, 'Will keep cookies for domains:');
 	DOMAINS_TO_KEEP.forEach(function(item) {
 		UI_UTILS.addItemToKeep(item);
 	});
-	UI_UTILS.addHtml('h1', 'Will remove...');
+
+	UI_UTILS.addElement(HEADER_TAG, 'Will remove cookies for domains:');
 	DOMAINS_TO_REMOVE.forEach(function(item) {
 		UI_UTILS.addItemToRemove(item);
 	});
 
 	// Add link to start actual removal...
+	var hr_elem = document.createElement('hr');
+	document.getElementById('container').appendChild(hr_elem);
+
 	var new_elem = document.createElement('button');
 	new_elem.id = 'cleanup_action';
 	new_elem.type = 'button';
@@ -190,5 +208,5 @@ function show_preview() {
 document.addEventListener('DOMContentLoaded', function() {
 	initLocalStorage();
 	populateWhiteList();
-	processCookies(show_preview);
+	filterCookies(show_preview);
 });
