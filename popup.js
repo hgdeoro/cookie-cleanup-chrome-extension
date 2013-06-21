@@ -48,6 +48,19 @@ var UI_UTILS = {
 		document.getElementById('container').appendChild(new_elem);
 	},
 
+	addHr : function() {
+		document.getElementById('container').appendChild(
+				document.createElement('hr'));
+	},
+
+	addBadge : function(badge_type, text) {
+		// <span class="badge badge-success">2</span>
+		new_elem = document.createElement('span');
+		new_elem.className = 'badge ' + badge_type;
+		new_elem.appendChild(document.createTextNode(text));
+		document.getElementById('container').appendChild(new_elem);
+	},
+
 };
 
 function cleanDomain(domain) {
@@ -174,6 +187,17 @@ function remove_cookies() {
 	COOKIES_TO_REMOVE.forEach(function(a_cookie) {
 		removeCookie(a_cookie, informed_cookies);
 	});
+
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+	UI_UTILS.addBadge('badge-success', 'Finished!');
+
+	document.getElementById('container').appendChild(
+			document.createTextNode(' '));
+
+	UI_UTILS.addBadge('badge-important', 'Removed ' + COOKIES_TO_REMOVE.length
+			+ ' cookies from ' + DOMAINS_TO_REMOVE.length + ' domains');
+
 }
 
 function show_preview() {
@@ -187,6 +211,8 @@ function show_preview() {
 		UI_UTILS.addItemToKeep(item);
 	});
 
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
 	UI_UTILS.addElement(HEADER_TAG, 'Will remove cookies for domains:');
 	DOMAINS_TO_REMOVE.forEach(function(item) {
 		UI_UTILS.addItemToRemove(item);
@@ -194,9 +220,7 @@ function show_preview() {
 
 	// Add link to start actual removal...
 
-	// ---------- <hr> ----------
-	document.getElementById('container').appendChild(
-			document.createElement('hr'));
+	UI_UTILS.addHr(); // ---------- <hr> ----------
 
 	var new_elem = document.createElement('button');
 	new_elem.id = 'cleanup_action';
@@ -207,28 +231,17 @@ function show_preview() {
 	document.querySelector('#cleanup_action').addEventListener('click',
 			remove_cookies);
 
-	// ---------- <hr> ----------
-	document.getElementById('container').appendChild(
-			document.createElement('hr'));
+	UI_UTILS.addHr(); // ---------- <hr> ----------
 
-	// <span class="badge badge-success">2</span>
-	new_elem = document.createElement('span');
-	new_elem.className = 'badge badge-success';
-	new_elem.appendChild(document.createTextNode('Will keep '
-			+ COOKIES_TO_KEEP.length + ' cookies from '
-			+ DOMAINS_TO_KEEP.length + ' domains'));
-	document.getElementById('container').appendChild(new_elem);
+	UI_UTILS.addBadge('badge-success', 'Will keep ' + COOKIES_TO_KEEP.length
+			+ ' cookies from ' + DOMAINS_TO_KEEP.length + ' domains');
 
 	document.getElementById('container').appendChild(
 			document.createTextNode(' '));
 
-	// <span class="badge badge-important">6</span>
-	new_elem = document.createElement('span');
-	new_elem.className = 'badge badge-important';
-	new_elem.appendChild(document.createTextNode('Will remove '
+	UI_UTILS.addBadge('badge-important', 'Will remove '
 			+ COOKIES_TO_REMOVE.length + ' cookies from '
-			+ DOMAINS_TO_REMOVE.length + ' domains'));
-	document.getElementById('container').appendChild(new_elem);
+			+ DOMAINS_TO_REMOVE.length + ' domains');
 
 }
 
