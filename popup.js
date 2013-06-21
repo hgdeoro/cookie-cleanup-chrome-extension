@@ -1,12 +1,26 @@
 // http://www.w3schools.com/jsref/jsref_obj_regexp.asp
 
+/**
+ * Cookies from 'white list' are NEVER deleted.
+ */
 var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
 
+/**
+ * Cookies from 'gray list' are delete with 'FULL CLEAN', but not with 'FAST
+ * CLEAN'.
+ */
+var INITIAL_GRAY_LIST = [];
+
 var WHITE_LIST_REGEXS = [];
-var DOMAINS_TO_KEEP = null;
-var DOMAINS_TO_REMOVE = null;
-var COOKIES_TO_KEEP = null;
-var COOKIES_TO_REMOVE = null;
+var GRAY_LIST_REGEXS = [];
+
+var WHITE_DOMAINS = null;
+var GRAY_DOMAINS = null;
+var BLACK_DOMAINS = null;
+
+var WHITE_COOKIES = null;
+var GRAY_COOKIES = null;
+var BLACK_COOKIES = null;
 
 var HEADER_TAG = 'h3';
 
@@ -84,6 +98,28 @@ function cleanDomainList(domain_list) {
 	return _list;
 }
 
+var COOKIE_COLOR_WHITE = 1; // Always keep
+var COOKIE_COLOR_GRAY = 2; // From gray list
+var COOKIE_COLOR_BLACK = 3; // Always remove
+
+function getCookieColor(a_cookie) {
+	/**
+	 * Return true|false, if the cookie should be keeped or not
+	 */
+	// a_cookie.name,
+	// a_cookie.value,
+	// a_cookie.domain;
+	for ( var i = 0; i < WHITE_LIST_REGEXS.length; i++) {
+		if (WHITE_LIST_REGEXS[i].test(a_cookie.domain))
+			return COOKIE_COLOR_WHITE;
+	}
+	for ( var i = 0; i < GRAY_LIST_REGEXS.length; i++) {
+		if (GRAY_LIST_REGEXS[i].test(a_cookie.domain))
+			return COOKIE_COLOR_GRAY;
+	}
+	return COOKIE_COLOR_BLACK;
+}
+
 function shouldKeepCookie(a_cookie) {
 	/**
 	 * Return true|false, if the cookie should be keeped or not
@@ -135,15 +171,35 @@ function populateWhiteList() {
 	});
 }
 
+function populateGrayList() {
+	/**
+	 * Populate the GRAY_LIST_REGEXS with RegExp objects from the configuration
+	 */
+	if (GRAY_LIST_REGEXS.length != 0)
+		return;
+
+	var gray_list = JSON.parse(localStorage.getItem('gray_list'));
+	console.info("Loaded `gray_list` = " + gray_list);
+
+	GRAY_LIST_REGEXS = gray_list.map(function(gl_item) {
+		var regex_item_string = '^(.*\\.|)' + gl_item.split('.').join('\\.')
+				+ '$';
+		return new RegExp(regex_item_string, "i");
+	});
+}
+
 function initLocalStorage() {
 	/**
 	 * Initializes local storage with default values
 	 */
-	if (localStorage.getItem('white_list') != null)
-		return;
-
-	console.info("Creating initial white_list...");
-	localStorage.setItem('white_list', JSON.stringify(INITIAL_WHITE_LIST));
+	if (localStorage.getItem('white_list') == null) {
+		console.info("Creating initial 'white_list'...");
+		localStorage.setItem('white_list', JSON.stringify(INITIAL_WHITE_LIST));
+	}
+	if (localStorage.getItem('gray_list') == null) {
+		console.info("Creating initial 'gray_list'...");
+		localStorage.setItem('gray_list', JSON.stringify(INITIAL_GRAY_LIST));
+	}
 }
 
 function filterCookies(callback) {
@@ -151,27 +207,46 @@ function filterCookies(callback) {
 	 * Process the cookies, and run `callback()` when done.
 	 */
 	chrome.cookies.getAll({}, function(all_the_cookies) {
-		var keeped_domains = [];
-		var removed_domains = [];
-		var cookies_to_remove = [];
-		var cookies_to_keep = [];
+		var white_domains = []; /* from white list */
+		var gray_domains = []; /* from gray list */
+		var black_domains = [];
+		var white_cookies = [];
+		var gray_cookies = [];
+		var black_cookies = [];
 
 		all_the_cookies.forEach(function(a_cookie) {
-			if (shouldKeepCookie(a_cookie)) {
-				if (keeped_domains.indexOf(a_cookie.domain) == -1)
-					keeped_domains.push(a_cookie.domain);
-				cookies_to_keep.push(a_cookie);
-			} else {
-				if (removed_domains.indexOf(a_cookie.domain) == -1)
-					removed_domains.push(a_cookie.domain);
-				cookies_to_remove.push(a_cookie);
+			var cookieColor = getCookieColor(a_cookie);
+			switch (cookieColor) {
+
+			case COOKIE_COLOR_WHITE:
+				if (white_domains.indexOf(a_cookie.domain) == -1)
+					white_domains.push(a_cookie.domain);
+				white_cookies.push(a_cookie);
+				break;
+
+			case COOKIE_COLOR_GRAY:
+				if (gray_domains.indexOf(a_cookie.domain) == -1)
+					gray_domains.push(a_cookie.domain);
+				gray_cookies.push(a_cookie);
+				break;
+
+			case COOKIE_COLOR_BLACK:
+				if (black_domains.indexOf(a_cookie.domain) == -1)
+					black_domains.push(a_cookie.domain);
+				black_cookies.push(a_cookie);
+				break;
+
 			}
+
 		});
 
-		DOMAINS_TO_KEEP = cleanDomainList(keeped_domains);
-		DOMAINS_TO_REMOVE = cleanDomainList(removed_domains);
-		COOKIES_TO_REMOVE = cookies_to_remove;
-		COOKIES_TO_KEEP = cookies_to_keep;
+		WHITE_DOMAINS = cleanDomainList(white_domains);
+		GRAY_DOMAINS = cleanDomainList(gray_domains);
+		BLACK_DOMAINS = cleanDomainList(black_domains);
+
+		BLACK_COOKIES = black_cookies;
+		GRAY_COOKIES = gray_cookies;
+		WHITE_COOKIES = white_cookies;
 
 		callback();
 	});
@@ -184,7 +259,7 @@ function remove_cookies() {
 	UI_UTILS.cleanHtml();
 	UI_UTILS.addElement(HEADER_TAG, 'Removed...');
 	var informed_cookies = {};
-	COOKIES_TO_REMOVE.forEach(function(a_cookie) {
+	BLACK_COOKIES.forEach(function(a_cookie) {
 		removeCookie(a_cookie, informed_cookies);
 	});
 
@@ -195,8 +270,8 @@ function remove_cookies() {
 	document.getElementById('container').appendChild(
 			document.createTextNode(' '));
 
-	UI_UTILS.addBadge('badge-important', 'Removed ' + COOKIES_TO_REMOVE.length
-			+ ' cookies from ' + DOMAINS_TO_REMOVE.length + ' domains');
+	UI_UTILS.addBadge('badge-important', 'Removed ' + BLACK_COOKIES.length
+			+ ' cookies from ' + BLACK_DOMAINS.length + ' domains');
 
 }
 
@@ -207,14 +282,21 @@ function show_preview() {
 	UI_UTILS.cleanHtml();
 
 	UI_UTILS.addElement(HEADER_TAG, 'Will keep cookies for domains:');
-	DOMAINS_TO_KEEP.forEach(function(item) {
+	WHITE_DOMAINS.forEach(function(item) {
 		UI_UTILS.addItemToKeep(item);
 	});
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
+	UI_UTILS.addElement(HEADER_TAG, 'Gray list domains:');
+	GRAY_DOMAINS.forEach(function(item) {
+		UI_UTILS.addItemToRemove(item);
+	});
+
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
 	UI_UTILS.addElement(HEADER_TAG, 'Will remove cookies for domains:');
-	DOMAINS_TO_REMOVE.forEach(function(item) {
+	BLACK_DOMAINS.forEach(function(item) {
 		UI_UTILS.addItemToRemove(item);
 	});
 
@@ -233,21 +315,25 @@ function show_preview() {
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
-	UI_UTILS.addBadge('badge-success', 'Will keep ' + COOKIES_TO_KEEP.length
-			+ ' cookies from ' + DOMAINS_TO_KEEP.length + ' domains');
+	UI_UTILS.addBadge('badge-success', 'Will keep ' + WHITE_COOKIES.length
+			+ ' cookies from ' + WHITE_DOMAINS.length + ' domains');
 
 	document.getElementById('container').appendChild(
 			document.createTextNode(' '));
 
-	UI_UTILS.addBadge('badge-important', 'Will remove '
-			+ COOKIES_TO_REMOVE.length + ' cookies from '
-			+ DOMAINS_TO_REMOVE.length + ' domains');
+	UI_UTILS.addBadge('badge-important', 'Will remove ' + BLACK_COOKIES.length
+			+ ' cookies from ' + BLACK_DOMAINS.length + ' domains');
 
 }
 
 // Run our kitten generation script as soon as the document's DOM is ready.
 document.addEventListener('DOMContentLoaded', function() {
+	console.info("Will initLocalStorage()");
 	initLocalStorage();
+	console.info("Will populateWhiteList()");
 	populateWhiteList();
+	console.info("Will populateGrayList()");
+	populateGrayList();
+	console.info("Will filterCookies()");
 	filterCookies(show_preview);
 });
