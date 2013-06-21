@@ -5,6 +5,7 @@ var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
 var WHITE_LIST_REGEXS = [];
 var DOMAINS_TO_KEEP = null;
 var DOMAINS_TO_REMOVE = null;
+var COOKIES_TO_KEEP = null;
 var COOKIES_TO_REMOVE = null;
 
 var HEADER_TAG = 'h3';
@@ -140,15 +141,16 @@ function filterCookies(callback) {
 		var keeped_domains = [];
 		var removed_domains = [];
 		var cookies_to_remove = [];
+		var cookies_to_keep = [];
 
 		all_the_cookies.forEach(function(a_cookie) {
 			if (shouldKeepCookie(a_cookie)) {
 				if (keeped_domains.indexOf(a_cookie.domain) == -1)
 					keeped_domains.push(a_cookie.domain);
+				cookies_to_keep.push(a_cookie);
 			} else {
-				if (removed_domains.indexOf(a_cookie.domain) == -1) {
+				if (removed_domains.indexOf(a_cookie.domain) == -1)
 					removed_domains.push(a_cookie.domain);
-				}
 				cookies_to_remove.push(a_cookie);
 			}
 		});
@@ -156,6 +158,7 @@ function filterCookies(callback) {
 		DOMAINS_TO_KEEP = cleanDomainList(keeped_domains);
 		DOMAINS_TO_REMOVE = cleanDomainList(removed_domains);
 		COOKIES_TO_REMOVE = cookies_to_remove;
+		COOKIES_TO_KEEP = cookies_to_keep;
 
 		callback();
 	});
@@ -190,8 +193,10 @@ function show_preview() {
 	});
 
 	// Add link to start actual removal...
-	var hr_elem = document.createElement('hr');
-	document.getElementById('container').appendChild(hr_elem);
+
+	// ---------- <hr> ----------
+	document.getElementById('container').appendChild(
+			document.createElement('hr'));
 
 	var new_elem = document.createElement('button');
 	new_elem.id = 'cleanup_action';
@@ -201,6 +206,29 @@ function show_preview() {
 	document.getElementById('container').appendChild(new_elem);
 	document.querySelector('#cleanup_action').addEventListener('click',
 			remove_cookies);
+
+	// ---------- <hr> ----------
+	document.getElementById('container').appendChild(
+			document.createElement('hr'));
+
+	// <span class="badge badge-success">2</span>
+	new_elem = document.createElement('span');
+	new_elem.className = 'badge badge-success';
+	new_elem.appendChild(document.createTextNode('Will keep '
+			+ COOKIES_TO_KEEP.length + ' cookies from '
+			+ DOMAINS_TO_KEEP.length + ' domains'));
+	document.getElementById('container').appendChild(new_elem);
+
+	document.getElementById('container').appendChild(
+			document.createTextNode(' '));
+
+	// <span class="badge badge-important">6</span>
+	new_elem = document.createElement('span');
+	new_elem.className = 'badge badge-important';
+	new_elem.appendChild(document.createTextNode('Will remove '
+			+ COOKIES_TO_REMOVE.length + ' cookies from '
+			+ DOMAINS_TO_REMOVE.length + ' domains'));
+	document.getElementById('container').appendChild(new_elem);
 
 }
 
