@@ -1,8 +1,8 @@
 // http://www.w3schools.com/jsref/jsref_obj_regexp.asp
 var WHITE_LIST_REGEXS = [
 // Google & co
-new RegExp("^(.*\.|)google\.com$", "i"),
-		new RegExp("^(.*\.|)youtube\.com$", "i"), ];
+new RegExp("^(.*\\.|)google\\.com$", "i"),
+		new RegExp("^(.*\\.|)youtube\\.com$", "i"), ];
 
 var utils = {
 	addHtml : function(tag, text) {
@@ -43,7 +43,12 @@ var cookiesCleaner = {
 		// do_cleanup == true -> do the cleanup
 		// do_cleanup != true -> preview
 		//
+		if (localStorage.getItem('white_list') == null) {
+			localStorage.setItem('white_list', JSON.stringify([ 'google.com',
+					'youtube.com' ]));
+		}
 		chrome.cookies.getAll({}, function(all_the_cookies) {
+			utils.addHtml('p', JSON.parse(localStorage.getItem('white_list')));
 			if (do_cleanup == true) {
 				console.info("Starting cleanup...");
 				utils.addHtml('h2', 'Keeping...');
