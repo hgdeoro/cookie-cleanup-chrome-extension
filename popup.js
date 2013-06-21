@@ -3,6 +3,29 @@ var WHITE_LIST_REGEXS = [];
 
 var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
 
+var DOMAINS_TO_KEEP = null;
+
+var DOMAINS_TO_REMOVE = null;
+
+var COOKIES_TO_REMOVE = null;
+
+function cleanDomainList(domain_list) {
+	/**
+	 * Return a sorted list of domains names.
+	 */
+	var _dict = {};
+	domain_list.forEach(function(domain) {
+		if (domain[0] == 'w' && domain[1] == 'w' && domain[2] == 'w')
+			domain = domain.substring(3);
+		if (domain[0] == '.')
+			domain = domain.substring(1);
+		_dict[domain] = 0;
+	});
+	var _list = Object.keys(_dict);
+	_list.sort();
+	return _list;
+}
+
 var utils = {
 	cleanHtml : function() {
 		/**
@@ -11,8 +34,6 @@ var utils = {
 		// document.body.innerHTML = "";
 		var container = document.getElementById('container');
 		container.innerHTML = "";
-		// if (container.firstChild)
-		// container.remove(container.firstChild);
 	},
 
 	addHtml : function(tag, text) {
@@ -22,6 +43,20 @@ var utils = {
 		var new_elem = document.createElement(tag);
 		new_elem.appendChild(document.createTextNode(text));
 		// document.body.appendChild(new_elem);
+		document.getElementById('container').appendChild(new_elem);
+	},
+
+	addItemToKeep : function(text) {
+		var new_elem = document.createElement('div');
+		new_elem.appendChild(document.createTextNode(text));
+		new_elem.className = 'text-success';
+		document.getElementById('container').appendChild(new_elem);
+	},
+
+	addItemToRemove : function(text) {
+		var new_elem = document.createElement('div');
+		new_elem.appendChild(document.createTextNode(text));
+		new_elem.className = 'text-error';
 		document.getElementById('container').appendChild(new_elem);
 	},
 
@@ -47,11 +82,12 @@ var utils = {
 		console.info("Removing cookie " + cookie);
 		var url = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain
 				+ cookie.path;
-		chrome.cookies.remove({
-			"url" : url,
-			"name" : cookie.name,
-			"storeId" : cookie.storeId,
-		});
+		// chrome.cookies.remove({
+		// "url" : url,
+		// "name" : cookie.name,
+		// "storeId" : cookie.storeId,
+		// });
+		utils.addItemToRemove(cookie.domain);
 	},
 
 	populateWhiteList : function() {
@@ -83,108 +119,65 @@ var utils = {
 		localStorage.setItem('white_list', JSON.stringify(INITIAL_WHITE_LIST));
 	},
 
+	processCookies : function(callback) {
+		/**
+		 * Process the cookies, and run `callback()` when done.
+		 */
+		chrome.cookies.getAll({}, function(all_the_cookies) {
+			var keeped_domains = [];
+			var removed_domains = [];
+			var cookies_to_remove = [];
+
+			all_the_cookies.forEach(function(a_cookie) {
+				if (utils.shouldKeep(a_cookie)) {
+					if (keeped_domains.indexOf(a_cookie.domain) == -1)
+						keeped_domains.push(a_cookie.domain);
+				} else {
+					if (removed_domains.indexOf(a_cookie.domain) == -1) {
+						removed_domains.push(a_cookie.domain);
+					}
+					cookies_to_remove.push(a_cookie);
+				}
+			});
+
+			DOMAINS_TO_KEEP = cleanDomainList(keeped_domains);
+			DOMAINS_TO_REMOVE = cleanDomainList(removed_domains);
+			COOKIES_TO_REMOVE = cookies_to_remove;
+
+			callback();
+		});
+	},
+
 };
 
 var cookiesCleaner = {
 
-	_preview_or_cleanup : function(do_cleanup) {
-		/**
-		 * Preview or cleanup the cookies.
-		 * 
-		 * do_cleanup == true -> CLEANUP
-		 * 
-		 * do_cleanup != true -> PREVIEW
-		 */
-		chrome.cookies.getAll({}, function(all_the_cookies) {
-
-			/*
-			 * Header
-			 */
-
-			if (do_cleanup == true) {
-				console.info("Starting cleanup...");
-				utils.addHtml('h1', 'Keeping...');
-			} else {
-				console.info("Starting preview...");
-				utils.addHtml('h1', 'Will keep...');
-			}
-			var keeped_domains = [];
-			var removed_domains = [];
-
-			/*
-			 * List cookies to keep/kept
-			 */
-
-			all_the_cookies.forEach(function(a_cookie) {
-				if (!utils.shouldKeep(a_cookie))
-					return;
-
-				//
-				// Keep this cookie...
-				//
-				if (keeped_domains.indexOf(a_cookie.domain) == -1) {
-					utils.addHtml('div', "Keep: " + a_cookie.domain);
-					keeped_domains.push(a_cookie.domain);
-				}
-
-			});
-
-			/*
-			 * List cookies to remove/removed
-			 */
-
-			if (do_cleanup == true) {
-				utils.addHtml('h1', 'Removing...');
-			} else {
-				utils.addHtml('h1', 'Will remove...');
-			}
-
-			all_the_cookies.forEach(function(a_cookie) {
-				if (utils.shouldKeep(a_cookie))
-					return;
-
-				//
-				// REMOVE this cookie...
-				//
-				if (removed_domains.indexOf(a_cookie.domain) == -1) {
-					utils.addHtml('div', "Remove: " + a_cookie.domain);
-					removed_domains.push(a_cookie.domain);
-				}
-				if (do_cleanup == true) {
-					utils.removeCookie(a_cookie);
-				}
-
-			});
-
-			/*
-			 * Add the footer with buttons
-			 */
-
-			if (do_cleanup == true) {
-				utils.addHtml('h1', 'Cleanup DONE!');
-			} else {
-				// Add link to start actual removal...
-				// <button class="btn btn-small" type="button">Small button</button>
-				var new_elem = document.createElement('button');
-				new_elem.id = 'cleanup_action';
-				new_elem.type = 'button';
-				new_elem.className = 'btn btn-danger btn-small';
-				new_elem.appendChild(document.createTextNode('Clean up'));
-				document.getElementById('container').appendChild(new_elem);
-				document.querySelector('#cleanup_action').addEventListener(
-						'click', cookiesCleaner.cleanup);
-			}
-		});
-	},
-
-	preview : function() {
+	show_preview : function() {
 		/**
 		 * Preview
 		 */
-		utils.initLocalStorage();
-		utils.populateWhiteList();
 		utils.cleanHtml();
-		cookiesCleaner._preview_or_cleanup(false); // do_cleanup: false
+
+		console.info("Starting preview...");
+		utils.addHtml('h1', 'Will keep...');
+		DOMAINS_TO_KEEP.forEach(function(item) {
+			utils.addItemToKeep(item);
+		});
+		utils.addHtml('h1', 'Will remove...');
+		DOMAINS_TO_REMOVE.forEach(function(item) {
+			utils.addItemToRemove(item);
+		});
+
+		// Add link to start actual removal...
+		var new_elem = document.createElement('button');
+		new_elem.id = 'cleanup_action';
+		new_elem.type = 'button';
+		new_elem.className = 'btn btn-danger btn-small';
+		new_elem.appendChild(document.createTextNode('Clean up'));
+		document.getElementById('container').appendChild(new_elem);
+		document.querySelector('#cleanup_action').addEventListener('click',
+				cookiesCleaner.cleanup);
+
 	},
 
 	cleanup : function() {
@@ -192,12 +185,17 @@ var cookiesCleaner = {
 		 * Clean Up
 		 */
 		utils.cleanHtml();
-		cookiesCleaner._preview_or_cleanup(true); // do_cleanup: true
+		utils.addHtml('h1', 'Removed...');
+		COOKIES_TO_REMOVE.forEach(function(a_cookie) {
+			utils.removeCookie(a_cookie);
+		});
 	},
 
 };
 
 // Run our kitten generation script as soon as the document's DOM is ready.
 document.addEventListener('DOMContentLoaded', function() {
-	cookiesCleaner.preview();
+	utils.initLocalStorage();
+	utils.populateWhiteList();
+	utils.processCookies(cookiesCleaner.show_preview);
 });
