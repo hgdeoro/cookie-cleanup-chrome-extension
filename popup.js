@@ -485,8 +485,7 @@ function show_preview() {
 
 }
 
-// Run our kitten generation script as soon as the document's DOM is ready.
-document.addEventListener('DOMContentLoaded', function() {
+function main() {
 	console.info("Will initLocalStorage()");
 	initLocalStorage();
 	console.info("Will populateWhiteList()");
@@ -495,4 +494,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	populateGrayList();
 	console.info("Will filterCookies()");
 	filterCookies(show_preview);
+}
+
+// Run our kitten generation script as soon as the document's DOM is ready.
+document.addEventListener('DOMContentLoaded', function() {
+	window.setTimeout(main, 5);
 });
