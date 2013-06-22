@@ -505,6 +505,10 @@ function show_preview() {
 
 }
 
+/*
+ * ----------
+ */
+
 function load_settings_items(localStorageKey, htmlContainerId, inputClassName) {
 	console.info("load_settings_items(" + localStorageKey + ")");
 	document.getElementById(htmlContainerId).innerHTML = '';
@@ -546,9 +550,6 @@ function show_settings() {
 
 	load_settings_items('gray_list', 'gray_list_domains',
 			'input_gray_list_item');
-
-	document.getElementById('settings_save_action').addEventListener('click',
-			save_settings);
 }
 
 function save_settings() {
@@ -565,6 +566,30 @@ function save_settings() {
 	main();
 }
 
+function add_empty_trusted_domain_textbox() {
+	var htmlContainerId = 'white_list_domains';
+	var inputClassName = 'input_white_list_item';
+	var textBox = document.createElement('input');
+	textBox.type = "text";
+	textBox.value = '';
+	textBox.className = inputClassName;
+	document.getElementById(htmlContainerId).appendChild(textBox);
+	document.getElementById(htmlContainerId).appendChild(
+			document.createElement('br'));
+}
+
+function add_empty_grey_domain_textbox() {
+	var htmlContainerId = 'gray_list_domains';
+	var inputClassName = 'input_gray_list_item';
+	var textBox = document.createElement('input');
+	textBox.type = "text";
+	textBox.value = '';
+	textBox.className = inputClassName;
+	document.getElementById(htmlContainerId).appendChild(textBox);
+	document.getElementById(htmlContainerId).appendChild(
+			document.createElement('br'));
+}
+
 function main() {
 	console.info("Will initLocalStorage()");
 	initLocalStorage();
@@ -578,5 +603,15 @@ function main() {
 
 // Run our kitten generation script as soon as the document's DOM is ready.
 document.addEventListener('DOMContentLoaded', function() {
+	// Add event listeners
+	document.getElementById('settings_save_action').addEventListener('click',
+			save_settings);
+
+	document.getElementById('add_new_trusted_domain_action').addEventListener(
+			'click', add_empty_trusted_domain_textbox);
+
+	document.getElementById('add_new_gray_domain_action').addEventListener(
+			'click', add_empty_grey_domain_textbox);
+
 	window.setTimeout(main, 5);
 });
