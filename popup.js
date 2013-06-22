@@ -386,6 +386,9 @@ function full_remove_cookies() {
 }
 
 function show_preview() {
+
+	console.info("show_preview()");
+
 	/**
 	 * Preview the cookies that will be kept and removed
 	 */
@@ -502,37 +505,59 @@ function show_preview() {
 
 }
 
+function load_settings_items(localStorageKey, htmlContainerId, inputClassName) {
+	console.info("load_settings_items(" + localStorageKey + ")");
+	document.getElementById(htmlContainerId).innerHTML = '';
+	console.info(" + JSON: " + localStorage.getItem(localStorageKey));
+	var white_list = JSON.parse(localStorage.getItem(localStorageKey));
+	white_list.forEach(function(item) {
+		console.info(" + item: " + item);
+		var textBox = document.createElement('input');
+		textBox.type = "text";
+		// textBox.setAttribute("value", item);
+		textBox.value = item;
+		textBox.className = inputClassName;
+		document.getElementById(htmlContainerId).appendChild(textBox);
+		document.getElementById(htmlContainerId).appendChild(
+				document.createElement('br'));
+	});
+}
+
+function save_settings_items(localStorageKey, inputClassName) {
+	console.info("save_settings_items(" + localStorageKey + ")");
+	var input_list = Array.prototype.slice.call(document
+			.getElementsByClassName(inputClassName));
+	var json_value = JSON.stringify(input_list.map(function(item) {
+		return item.value;
+	}));
+	console.info("JSON to save: '" + localStorageKey + "' -> '" + json_value
+			+ "'");
+	localStorage.setItem(localStorageKey, json_value);
+}
+
 function show_settings() {
+	console.info("show_settings()");
+
 	document.getElementById('container').className = 'container hidden';
 	document.getElementById('config').className = 'container';
 
-	document.getElementById('white_list_domains').innerHTML = '';
-	var white_list = JSON.parse(localStorage.getItem('white_list'));
-	white_list.forEach(function(item) {
-		var textBox = document.createElement('input');
-		textBox.type = "text";
-		textBox.setAttribute("value", item);
-		document.getElementById('white_list_domains').appendChild(textBox);
-		document.getElementById('white_list_domains').appendChild(
-				document.createElement('br'));
-	});
+	load_settings_items('white_list', 'white_list_domains',
+			'input_white_list_item');
 
-	document.getElementById('gray_list_domains').innerHTML = '';
-	var white_list = JSON.parse(localStorage.getItem('gray_list'));
-	white_list.forEach(function(item) {
-		var textBox = document.createElement('input');
-		textBox.type = "text";
-		textBox.setAttribute("value", item);
-		document.getElementById('gray_list_domains').appendChild(textBox);
-		document.getElementById('gray_list_domains').appendChild(
-				document.createElement('br'));
-	});
+	load_settings_items('gray_list', 'gray_list_domains',
+			'input_gray_list_item');
 
 	document.getElementById('settings_save_action').addEventListener('click',
 			save_settings);
 }
 
 function save_settings() {
+	save_settings_items('white_list', 'input_white_list_item');
+	save_settings_items('gray_list', 'input_gray_list_item');
+
+	/*
+	 * set UI
+	 */
 	reset();
 	UI_UTILS.cleanHtml();
 	document.getElementById('container').className = 'container';
