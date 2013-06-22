@@ -26,7 +26,7 @@ var COMPACT = true;
 
 var DRY_RUN = true;
 
-var HEADER_TAG = 'h3';
+var HEADER_TAG = 'h4';
 
 var UI_UTILS = {
 	cleanHtml : function() {
