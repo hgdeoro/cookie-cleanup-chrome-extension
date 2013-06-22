@@ -468,6 +468,45 @@ function show_preview() {
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
+	var new_elem = document.createElement('button');
+	new_elem.id = 'show_settings_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-small';
+	new_elem.appendChild(document.createTextNode('Settings...'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#show_settings_action').addEventListener('click',
+			show_settings);
+
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+}
+
+function show_settings() {
+	document.getElementById('container').className = 'container hidden';
+	document.getElementById('config').className = 'container';
+
+	document.getElementById('white_list_domains').innerHTML = '';
+	var white_list = JSON.parse(localStorage.getItem('white_list'));
+	white_list.forEach(function(item) {
+		var textBox = document.createElement('input');
+		textBox.type = "text";
+		textBox.setAttribute("value", item);
+		document.getElementById('white_list_domains').appendChild(textBox);
+		document.getElementById('white_list_domains').appendChild(
+				document.createElement('br'));
+	});
+
+	document.getElementById('gray_list_domains').innerHTML = '';
+	var white_list = JSON.parse(localStorage.getItem('gray_list'));
+	white_list.forEach(function(item) {
+		var textBox = document.createElement('input');
+		textBox.type = "text";
+		textBox.setAttribute("value", item);
+		document.getElementById('gray_list_domains').appendChild(textBox);
+		document.getElementById('gray_list_domains').appendChild(
+				document.createElement('br'));
+	});
+
 }
 
 function main() {

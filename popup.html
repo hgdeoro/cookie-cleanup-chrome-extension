@@ -9,6 +9,10 @@ body {
 	overflow-x: hidden;
 	padding: 5px;
 }
+
+.hidden {
+	display: none;
+}
 </style>
 <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -27,6 +31,23 @@ body {
 		</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
+	</div>
+	<div class="container hidden" id="config">
+		<form>
+			<fieldset>
+				<legend>Trusted domains</legend>
+				<div id="white_list_domains">
+					<input type="text">
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Gray-list domains</legend>
+				<div id=gray_list_domains>
+					<input type="text">
+				</div>
+			</fieldset>
+			<button type="button" class="btn">Save</button>
+		</form>
 	</div>
 </body>
 </html>
