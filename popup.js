@@ -275,6 +275,7 @@ function populateSettings() {
 	 * Populate settings from localStorage (except white/gray list).
 	 */
 	COMPACT = JSON.parse(localStorage.getItem('compact_mode'));
+	DRY_RUN = JSON.parse(localStorage.getItem('dry_run'));
 }
 
 function initLocalStorage() {
@@ -292,6 +293,10 @@ function initLocalStorage() {
 	if (localStorage.getItem('compact_mode') == null) {
 		console.info("Creating initial 'compact_mode'...");
 		localStorage.setItem('compact_mode', JSON.stringify(false));
+	}
+	if (localStorage.getItem('dry_run') == null) {
+		console.info("Creating initial 'dry_run'...");
+		localStorage.setItem('dry_run', JSON.stringify(false));
 	}
 }
 
@@ -586,12 +591,14 @@ function show_settings() {
 			'input_gray_list_item');
 
 	load_settings_boolean('compact_mode', 'checkbox_compact_mode');
+	load_settings_boolean('dry_run', 'checkbox_dry_run');
 }
 
 function save_settings() {
 	save_settings_items('white_list', 'input_white_list_item');
 	save_settings_items('gray_list', 'input_gray_list_item');
 	save_settings_boolean('compact_mode', 'checkbox_compact_mode');
+	save_settings_boolean('dry_run', 'checkbox_dry_run');
 
 	/*
 	 * set UI
