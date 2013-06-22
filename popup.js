@@ -531,9 +531,13 @@ function save_settings_items(localStorageKey, inputClassName) {
 	console.info("save_settings_items(" + localStorageKey + ")");
 	var input_list = Array.prototype.slice.call(document
 			.getElementsByClassName(inputClassName));
-	var json_value = JSON.stringify(input_list.map(function(item) {
-		return item.value;
-	}));
+	var values = input_list.map(function(item) {
+		return item.value.trim();
+	});
+	values = values.filter(function(val) {
+		return val.length > 0;
+	});
+	var json_value = JSON.stringify(values);
 	console.info("JSON to save: '" + localStorageKey + "' -> '" + json_value
 			+ "'");
 	localStorage.setItem(localStorageKey, json_value);
