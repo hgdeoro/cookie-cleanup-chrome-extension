@@ -58,6 +58,7 @@ var UI_UTILS = {
 	},
 
 	addItemFromWhiteList : function(text) {
+		// Green
 		if (COMPACT) {
 			var label_elem = document.createElement('span');
 			label_elem.appendChild(document.createTextNode(text));
@@ -76,6 +77,7 @@ var UI_UTILS = {
 	},
 
 	addItemFromBlackList : function(text) {
+		// Red
 		if (COMPACT) {
 			var label_elem = document.createElement('span');
 			label_elem.appendChild(document.createTextNode(text));
@@ -94,6 +96,7 @@ var UI_UTILS = {
 	},
 
 	addItemFromGreyList : function(text) {
+		// Gray
 		if (COMPACT) {
 			var label_elem = document.createElement('span');
 			label_elem.appendChild(document.createTextNode(text));
@@ -106,13 +109,28 @@ var UI_UTILS = {
 			var small_elem = document.createElement('small');
 			small_elem.appendChild(document.createTextNode(text));
 			new_elem.appendChild(small_elem);
-			new_elem.className = 'text-warning';
+			new_elem.className = 'muted';
 			document.getElementById('container').appendChild(new_elem);
 		}
 	},
 
 	addRemovedItem : function(text) {
-		UI_UTILS.addItemFromBlackList(text);
+		// Blue
+		if (COMPACT) {
+			var label_elem = document.createElement('span');
+			label_elem.appendChild(document.createTextNode(text));
+			label_elem.className = 'label label-info';
+			document.getElementById('container').appendChild(label_elem);
+			document.getElementById('container').appendChild(
+					document.createTextNode(' '));
+		} else {
+			var new_elem = document.createElement('div');
+			var small_elem = document.createElement('small');
+			small_elem.appendChild(document.createTextNode(text));
+			new_elem.appendChild(small_elem);
+			new_elem.className = 'text-info';
+			document.getElementById('container').appendChild(new_elem);
+		}
 	},
 
 	addHr : function() {
