@@ -196,21 +196,6 @@ function getCookieColor(a_cookie) {
 	return COOKIE_COLOR_BLACK;
 }
 
-function shouldKeepCookie(a_cookie) {
-	/**
-	 * Return true|false, if the cookie should be keeped or not
-	 */
-	// a_cookie.name,
-	// a_cookie.value,
-	// a_cookie.domain;
-	for ( var i = 0; i < WHITE_LIST_REGEXS.length; i++) {
-		if (WHITE_LIST_REGEXS[i].test(a_cookie.domain)) {
-			return true;
-		}
-	}
-	return false;
-}
-
 function removeCookie(cookie, informed) {
 	/**
 	 * Removes a cookie.
