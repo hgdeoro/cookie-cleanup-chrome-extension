@@ -25,6 +25,9 @@ var WHITE_COOKIES = null;
 var GRAY_COOKIES = null;
 var BLACK_COOKIES = null;
 
+var COMPACT = true;
+var DRY_RUN = true;
+
 function reset() {
 	WHITE_LIST_REGEXS = [];
 	GRAY_LIST_REGEXS = [];
@@ -34,14 +37,9 @@ function reset() {
 	WHITE_COOKIES = null;
 	GRAY_COOKIES = null;
 	BLACK_COOKIES = null;
+	COMPACT = true;
+	DRY_RUN = true;
 }
-
-/*
- * Configuration
- */
-
-var COMPACT = true;
-var DRY_RUN = true;
 
 /*
  * Constants and utilities
@@ -272,6 +270,13 @@ function populateGrayList() {
 	});
 }
 
+function populateSettings() {
+	/**
+	 * Populate settings from localStorage (except white/gray list).
+	 */
+	COMPACT = JSON.parse(localStorage.getItem('compact_mode'));
+}
+
 function initLocalStorage() {
 	/**
 	 * Initializes local storage with default values
@@ -283,6 +288,10 @@ function initLocalStorage() {
 	if (localStorage.getItem('gray_list') == null) {
 		console.info("Creating initial 'gray_list'...");
 		localStorage.setItem('gray_list', JSON.stringify(INITIAL_GRAY_LIST));
+	}
+	if (localStorage.getItem('compact_mode') == null) {
+		console.info("Creating initial 'compact_mode'...");
+		localStorage.setItem('compact_mode', JSON.stringify(false));
 	}
 }
 
@@ -543,6 +552,25 @@ function save_settings_items(localStorageKey, inputClassName) {
 	localStorage.setItem(localStorageKey, json_value);
 }
 
+function load_settings_boolean(localStorageKey, checkboxId) {
+	console.info("load_settings_boolean(" + localStorageKey + ")");
+	var compact = JSON.parse(localStorage.getItem(localStorageKey));
+	console.info(" + loaded value: " + compact);
+	if (compact) {
+		document.getElementById(checkboxId).checked = true;
+	} else {
+		document.getElementById(checkboxId).checked = false;
+	}
+}
+
+function save_settings_boolean(localStorageKey, checkboxId) {
+	console.info("save_settings_boolean(" + localStorageKey + ")");
+	if (document.getElementById(checkboxId).checked)
+		localStorage.setItem(localStorageKey, JSON.stringify(true));
+	else
+		localStorage.setItem(localStorageKey, JSON.stringify(false));
+}
+
 function show_settings() {
 	console.info("show_settings()");
 
@@ -554,11 +582,14 @@ function show_settings() {
 
 	load_settings_items('gray_list', 'gray_list_domains',
 			'input_gray_list_item');
+
+	load_settings_bookean('compact_mode', 'checkbox_compact_mode');
 }
 
 function save_settings() {
 	save_settings_items('white_list', 'input_white_list_item');
 	save_settings_items('gray_list', 'input_gray_list_item');
+	save_settings_boolean('compact_mode', 'checkbox_compact_mode');
 
 	/*
 	 * set UI
@@ -601,6 +632,8 @@ function main() {
 	populateWhiteList();
 	console.info("Will populateGrayList()");
 	populateGrayList();
+	console.info("Will populateSettings()");
+	populateSettings();
 	console.info("Will filterCookies()");
 	filterCookies(show_preview);
 }
