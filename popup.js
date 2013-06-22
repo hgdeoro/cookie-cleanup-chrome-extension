@@ -554,9 +554,9 @@ function save_settings_items(localStorageKey, inputClassName) {
 
 function load_settings_boolean(localStorageKey, checkboxId) {
 	console.info("load_settings_boolean(" + localStorageKey + ")");
-	var compact = JSON.parse(localStorage.getItem(localStorageKey));
-	console.info(" + loaded value: " + compact);
-	if (compact) {
+	var value = JSON.parse(localStorage.getItem(localStorageKey));
+	console.info(" + loaded value: " + value);
+	if (value == true) {
 		document.getElementById(checkboxId).checked = true;
 	} else {
 		document.getElementById(checkboxId).checked = false;
@@ -565,7 +565,9 @@ function load_settings_boolean(localStorageKey, checkboxId) {
 
 function save_settings_boolean(localStorageKey, checkboxId) {
 	console.info("save_settings_boolean(" + localStorageKey + ")");
-	if (document.getElementById(checkboxId).checked)
+	var value = document.getElementById(checkboxId).checked;
+	console.info(" + value to save: " + value);
+	if (value == true)
 		localStorage.setItem(localStorageKey, JSON.stringify(true));
 	else
 		localStorage.setItem(localStorageKey, JSON.stringify(false));
@@ -583,7 +585,7 @@ function show_settings() {
 	load_settings_items('gray_list', 'gray_list_domains',
 			'input_gray_list_item');
 
-	load_settings_bookean('compact_mode', 'checkbox_compact_mode');
+	load_settings_boolean('compact_mode', 'checkbox_compact_mode');
 }
 
 function save_settings() {
