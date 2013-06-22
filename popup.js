@@ -11,6 +11,9 @@ var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
  */
 var INITIAL_GRAY_LIST = [];
 
+/*
+ * Global variables
+ */
 var WHITE_LIST_REGEXS = [];
 var GRAY_LIST_REGEXS = [];
 
@@ -22,11 +25,33 @@ var WHITE_COOKIES = null;
 var GRAY_COOKIES = null;
 var BLACK_COOKIES = null;
 
-var COMPACT = true;
+function reset() {
+	WHITE_LIST_REGEXS = [];
+	GRAY_LIST_REGEXS = [];
+	WHITE_DOMAINS = null;
+	GRAY_DOMAINS = null;
+	BLACK_DOMAINS = null;
+	WHITE_COOKIES = null;
+	GRAY_COOKIES = null;
+	BLACK_COOKIES = null;
+}
 
+/*
+ * Configuration
+ */
+
+var COMPACT = true;
 var DRY_RUN = true;
 
+/*
+ * Constants and utilities
+ */
+
 var HEADER_TAG = 'h4';
+
+var COOKIE_COLOR_WHITE = 1; // Always keep
+var COOKIE_COLOR_GRAY = 2; // From gray list
+var COOKIE_COLOR_BLACK = 3; // Always remove
 
 var UI_UTILS = {
 	cleanHtml : function() {
@@ -173,10 +198,6 @@ function cleanDomainList(domain_list) {
 	_list.sort();
 	return _list;
 }
-
-var COOKIE_COLOR_WHITE = 1; // Always keep
-var COOKIE_COLOR_GRAY = 2; // From gray list
-var COOKIE_COLOR_BLACK = 3; // Always remove
 
 function getCookieColor(a_cookie) {
 	/**
@@ -507,6 +528,16 @@ function show_settings() {
 				document.createElement('br'));
 	});
 
+	document.getElementById('settings_save_action').addEventListener('click',
+			save_settings);
+}
+
+function save_settings() {
+	reset();
+	UI_UTILS.cleanHtml();
+	document.getElementById('container').className = 'container';
+	document.getElementById('config').className = 'container hidden';
+	main();
 }
 
 function main() {
