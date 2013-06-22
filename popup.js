@@ -6,7 +6,7 @@
 var INITIAL_WHITE_LIST = [ "google.com", "youtube.com" ];
 
 /**
- * Cookies from 'gray list' are delete with 'FULL CLEAN', but not with 'FAST
+ * Cookies from 'gray list' are delete with 'FULL CLEAN', but not with 'QUICK
  * CLEAN'.
  */
 var INITIAL_GRAY_LIST = [];
@@ -319,7 +319,12 @@ function show_preview() {
 	/**
 	 * Preview the cookies that will be kept and removed
 	 */
+
 	UI_UTILS.cleanHtml();
+
+	/*
+	 * Show cookies from white/gray/black list.
+	 */
 
 	UI_UTILS.addElement(HEADER_TAG, 'Will keep cookies for domains:');
 	WHITE_DOMAINS.forEach(function(item) {
@@ -340,23 +345,46 @@ function show_preview() {
 		UI_UTILS.addItemToRemove(item);
 	});
 
-	// Add link to start actual removal...
+	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+	/*
+	 * Show cookies from white-list.
+	 */
+
+	UI_UTILS.addBadge('badge-success', '' + WHITE_COOKIES.length
+			+ ' cookies from ' + WHITE_DOMAINS.length
+			+ ' domains from WHITE LIST will NEVER be removed.');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+	/*
+	 * QUICK cleanup
+	 */
 
 	var new_elem = document.createElement('button');
 	new_elem.id = 'quick_cleanup_action';
 	new_elem.type = 'button';
-	new_elem.className = 'btn btn-success btn-small';
-	new_elem.appendChild(document.createTextNode('Fast clean up'));
+	new_elem.className = 'btn btn-primary btn-small';
+	new_elem.appendChild(document.createTextNode('Quick clean up'));
 	document.getElementById('container').appendChild(new_elem);
 	document.querySelector('#quick_cleanup_action').addEventListener('click',
 			quick_remove_cookies);
 
-	UI_UTILS
-			.addElement('p', 'Remove cookies from black-listed domains only...');
+	UI_UTILS.addElement('span', ' ');
+
+	UI_UTILS.addElement('small', 'Remove cookies from domains on black-list.');
+
+	UI_UTILS.addBr(); // <br>
+
+	UI_UTILS.addBadge('badge-inverse', '' + BLACK_COOKIES.length
+			+ ' cookies from ' + BLACK_DOMAINS.length
+			+ ' domains from BLACK LIST will be removed.');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
+
+	/*
+	 * FULL cleanup
+	 */
 
 	var new_elem = document.createElement('button');
 	new_elem.id = 'full_cleanup_action';
@@ -367,27 +395,23 @@ function show_preview() {
 	document.querySelector('#full_cleanup_action').addEventListener('click',
 			full_remove_cookies);
 
-	UI_UTILS.addElement('p',
-			'Remove all the cookies (included that from gray-list domains)');
+	UI_UTILS.addElement('span', ' ');
+
+	UI_UTILS.addElement('small',
+			'Remove cookies from domains on black-list and gray-list.');
+
+	UI_UTILS.addBr(); // <br>
+
+	UI_UTILS.addBadge('', '' + GRAY_COOKIES.length + ' cookies from '
+			+ GRAY_DOMAINS.length + ' domains from GRAY LIST will be removed.');
+
+	UI_UTILS.addBr(); // <br>
+
+	UI_UTILS.addBadge('badge-inverse', '' + BLACK_COOKIES.length
+			+ ' cookies from ' + BLACK_DOMAINS.length
+			+ ' domains from BLACK LIST will be removed.');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
-
-	UI_UTILS
-			.addBadge('badge-success', '' + WHITE_COOKIES.length
-					+ ' cookies from ' + WHITE_DOMAINS.length
-					+ ' domains will be kept');
-
-	UI_UTILS.addBr(); // <br>
-
-	UI_UTILS.addBadge('badge-warning', '' + GRAY_COOKIES.length
-			+ ' cookies from ' + GRAY_DOMAINS.length
-			+ ' domains are gray-listed');
-
-	UI_UTILS.addBr(); // <br>
-
-	UI_UTILS.addBadge('badge-important', '' + BLACK_COOKIES.length
-			+ ' cookies from ' + BLACK_DOMAINS.length
-			+ ' domains will be removed');
 
 }
 
