@@ -456,21 +456,6 @@ function show_preview() {
 	 * QUICK cleanup
 	 */
 
-	var new_elem = document.createElement('button');
-	new_elem.id = 'quick_cleanup_action';
-	new_elem.type = 'button';
-	new_elem.className = 'btn btn-primary btn-small';
-	new_elem.appendChild(document.createTextNode('Quick clean up'));
-	document.getElementById('container').appendChild(new_elem);
-	document.querySelector('#quick_cleanup_action').addEventListener('click',
-			quick_remove_cookies);
-
-	UI_UTILS.addElement('span', ' ');
-
-	UI_UTILS.addElement('small', "Remove UNTRUSTED cookies only.");
-
-	UI_UTILS.addBr(); // <br>
-
 	UI_UTILS.addBadgeAndText('badge-success', "" + WHITE_COOKIES.length,
 			" cookies from " + WHITE_DOMAINS.length
 			+ " TRUSTED domains won't be removed.");
@@ -481,26 +466,24 @@ function show_preview() {
 			' cookies from ' + BLACK_DOMAINS.length
 			+ ' domains from BLACK LIST will be removed.');
 
+	UI_UTILS.addBr(); // <br>
+
+	var new_elem = document.createElement('button');
+	new_elem.id = 'quick_cleanup_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-primary btn-small';
+	new_elem.appendChild(document.createTextNode('Quick clean up'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#quick_cleanup_action').addEventListener('click',
+			quick_remove_cookies);
+	UI_UTILS.addElement('span', ' ');
+	UI_UTILS.addElement('small', "Remove UNTRUSTED cookies only.");
+
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
 	/*
 	 * FULL cleanup
 	 */
-
-	var new_elem = document.createElement('button');
-	new_elem.id = 'full_cleanup_action';
-	new_elem.type = 'button';
-	new_elem.className = 'btn btn-danger btn-small';
-	new_elem.appendChild(document.createTextNode('FULL cleanup'));
-	document.getElementById('container').appendChild(new_elem);
-	document.querySelector('#full_cleanup_action').addEventListener('click',
-			full_remove_cookies);
-
-	UI_UTILS.addElement('span', ' ');
-
-	UI_UTILS.addElement('small', "Remove UNTRUSTED and GRAY LIST cookies.");
-
-	UI_UTILS.addBr(); // <br>
 
 	UI_UTILS.addBadgeAndText('badge-success', "" + WHITE_COOKIES.length,
 			" cookies from " + WHITE_DOMAINS.length
@@ -517,6 +500,19 @@ function show_preview() {
 	UI_UTILS.addBadgeAndText('badge-important', '' + BLACK_COOKIES.length,
 			' cookies from ' + BLACK_DOMAINS.length
 			+ ' UNTRUSTED domains  will be removed.');
+
+	UI_UTILS.addBr(); // <br>
+
+	var new_elem = document.createElement('button');
+	new_elem.id = 'full_cleanup_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-danger btn-small';
+	new_elem.appendChild(document.createTextNode('FULL cleanup'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#full_cleanup_action').addEventListener('click',
+			full_remove_cookies);
+	UI_UTILS.addElement('span', ' ');
+	UI_UTILS.addElement('small', "Remove UNTRUSTED and GRAY LIST cookies.");
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
