@@ -174,6 +174,19 @@ var UI_UTILS = {
 		document.getElementById('container').appendChild(new_elem);
 	},
 
+	addBadgeAndText : function(badge_type, badge_text, text) {
+		// <span class="badge badge-success">2</span>
+		var badge_elem = document.createElement('span');
+		badge_elem.className = 'badge ' + badge_type;
+		badge_elem.appendChild(document.createTextNode(badge_text));
+
+		var outer_elem = document.createElement('small');
+		outer_elem.appendChild(badge_elem);
+		outer_elem.appendChild(document.createTextNode(text));
+
+		document.getElementById('container').appendChild(outer_elem);
+	},
+
 };
 
 function cleanDomain(domain) {
@@ -458,14 +471,14 @@ function show_preview() {
 
 	UI_UTILS.addBr(); // <br>
 
-	UI_UTILS.addBadge('badge-success', "" + WHITE_COOKIES.length
-			+ " cookies from " + WHITE_DOMAINS.length
+	UI_UTILS.addBadgeAndText('badge-success', "" + WHITE_COOKIES.length,
+			" cookies from " + WHITE_DOMAINS.length
 			+ " TRUSTED domains won't be removed.");
 
 	UI_UTILS.addBr(); // <br>
 
-	UI_UTILS.addBadge('badge-important', '' + BLACK_COOKIES.length
-			+ ' cookies from ' + BLACK_DOMAINS.length
+	UI_UTILS.addBadgeAndText('badge-important', "" + BLACK_COOKIES.length,
+			' cookies from ' + BLACK_DOMAINS.length
 			+ ' domains from BLACK LIST will be removed.');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
@@ -489,19 +502,20 @@ function show_preview() {
 
 	UI_UTILS.addBr(); // <br>
 
-	UI_UTILS.addBadge('badge-success', "" + WHITE_COOKIES.length
-			+ " cookies from " + WHITE_DOMAINS.length
+	UI_UTILS.addBadgeAndText('badge-success', "" + WHITE_COOKIES.length,
+			" cookies from " + WHITE_DOMAINS.length
 			+ " TRUSTED domains won't be removed.");
 
 	UI_UTILS.addBr(); // <br>
 
-	UI_UTILS.addBadge('', '' + GRAY_COOKIES.length + ' cookies from '
-			+ GRAY_DOMAINS.length + ' domains from GRAY LIST will be removed.');
+	UI_UTILS.addBadgeAndText('', '' + GRAY_COOKIES.length,
+			' cookies from ' + GRAY_DOMAINS.length +
+			' domains from GRAY LIST will be removed.');
 
 	UI_UTILS.addBr(); // <br>
 
-	UI_UTILS.addBadge('badge-important', '' + BLACK_COOKIES.length
-			+ ' cookies from ' + BLACK_DOMAINS.length
+	UI_UTILS.addBadgeAndText('badge-important', '' + BLACK_COOKIES.length,
+			' cookies from ' + BLACK_DOMAINS.length
 			+ ' UNTRUSTED domains  will be removed.');
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
