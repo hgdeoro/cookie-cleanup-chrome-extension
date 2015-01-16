@@ -423,6 +423,34 @@ function show_preview() {
 	UI_UTILS.cleanHtml();
 
 	/*
+	 * Add buttons to the top
+	 */
+
+	var new_elem = document.createElement('button');
+	new_elem.id = 'quick_cleanup_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-primary btn-small';
+	new_elem.appendChild(document.createTextNode('Quick clean up'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#quick_cleanup_action').addEventListener('click',
+			quick_remove_cookies);
+	// UI_UTILS.addElement('span', ' ');
+	// UI_UTILS.addElement('small', "Remove UNTRUSTED cookies only.");
+
+	UI_UTILS.addElement('span', ' ');
+
+	var new_elem = document.createElement('button');
+	new_elem.id = 'full_cleanup_action';
+	new_elem.type = 'button';
+	new_elem.className = 'btn btn-danger btn-small';
+	new_elem.appendChild(document.createTextNode('FULL cleanup'));
+	document.getElementById('container').appendChild(new_elem);
+	document.querySelector('#full_cleanup_action').addEventListener('click',
+			full_remove_cookies);
+	// UI_UTILS.addElement('span', ' ');
+	// UI_UTILS.addElement('small', "Remove UNTRUSTED and GRAY LIST cookies.");
+
+	/*
 	 * Show cookies from white/gray/black list.
 	 */
 
@@ -468,17 +496,6 @@ function show_preview() {
 
 	UI_UTILS.addBr(); // <br>
 
-	var new_elem = document.createElement('button');
-	new_elem.id = 'quick_cleanup_action';
-	new_elem.type = 'button';
-	new_elem.className = 'btn btn-primary btn-small';
-	new_elem.appendChild(document.createTextNode('Quick clean up'));
-	document.getElementById('container').appendChild(new_elem);
-	document.querySelector('#quick_cleanup_action').addEventListener('click',
-			quick_remove_cookies);
-	UI_UTILS.addElement('span', ' ');
-	UI_UTILS.addElement('small', "Remove UNTRUSTED cookies only.");
-
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
 	/*
@@ -500,19 +517,6 @@ function show_preview() {
 	UI_UTILS.addBadgeAndText('badge-important', '' + BLACK_COOKIES.length,
 			' cookies from ' + BLACK_DOMAINS.length
 			+ ' UNTRUSTED domains  will be removed.');
-
-	UI_UTILS.addBr(); // <br>
-
-	var new_elem = document.createElement('button');
-	new_elem.id = 'full_cleanup_action';
-	new_elem.type = 'button';
-	new_elem.className = 'btn btn-danger btn-small';
-	new_elem.appendChild(document.createTextNode('FULL cleanup'));
-	document.getElementById('container').appendChild(new_elem);
-	document.querySelector('#full_cleanup_action').addEventListener('click',
-			full_remove_cookies);
-	UI_UTILS.addElement('span', ' ');
-	UI_UTILS.addElement('small', "Remove UNTRUSTED and GRAY LIST cookies.");
 
 	UI_UTILS.addHr(); // ---------- <hr> ----------
 
